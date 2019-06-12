@@ -6,6 +6,7 @@ import (
 	"github.com/pmoorani/booksAPI/config"
 	"github.com/pmoorani/booksAPI/middlewares"
 	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -19,9 +20,12 @@ var err error
 
 func init() {
 	// Load .env file
-	if err := godotenv.Load(); err != nil {
-		log.Print("No .env file found!")
-	}
+	_ = godotenv.Load()
+	log.Println("init()")
+	//if err := godotenv.Load("sc.env"); err != nil {
+	//	log.Print("No .env file found!")
+	//	return
+	//}
 }
 
 func main() {
@@ -30,20 +34,16 @@ func main() {
 
 	// Connection String
 	connectionString := fmt.Sprintf("%s:%s@/%s?charset=utf8&parseTime=True&loc=Local", conf.DBConfig.DBUsername, conf.DBConfig.DBPassword, conf.DBConfig.DBName)
+	fmt.Println(connectionString)
 	database.DB, err = gorm.Open("mysql", connectionString)
 	if err != nil {
-		panic("failed to connect database")
+		panic("Failed to connect database")
 	}
 
 	// Migrate the schema
-	//database.DB.DropTableIfExists(&models.Author{}, &models.Book{})
 	database.DB.Debug().AutoMigrate(&models.Author{}, &models.Book{}, &models.User{}, &models.Claims{})
-	/*database.DB.Create(&models.Author{Fname:"raj", Lname:"moorani"})
-	database.DB.First(&author)
 
-	database.DB.Create(&models.Book{Isbn:"443212", Title:"Some book 1", AuthorID: author.ID})
-	database.DB.Create(&models.Book{Isbn:"534124", Title:"Some book 2", AuthorID: author.ID})*/
-
+	port := os.Getenv("PORT")
 	router := gin.Default()
 	router.Use(middlewares.TokenAuthMiddleware())
 	api := router.Group("/api")
@@ -60,5 +60,11 @@ func main() {
 		api.POST("/login", controllers.Login)
 		api.POST("/register", controllers.Register)
 	}
-	router.Run()
+	// By default it serves on :8080 unless a
+	// PORT environment variable was defined.
+	if port == "" {
+		router.Run(":8080")
+	} else {
+		router.Run(":" + port)
+	}
 }

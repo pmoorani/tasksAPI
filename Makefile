@@ -13,4 +13,5 @@ heroku: $(DOCKER_CMD)
 	heroku container:push web
 
 dev:
+	sh script.sh
 	go run .
