@@ -1,6 +1,7 @@
 module github.com/pmoorani/booksAPI
 
-go 1.12.5
+go 1.12
+// +heroku goVersion go1.12
 
 require (
 	cloud.google.com/go v0.39.0 // indirect
