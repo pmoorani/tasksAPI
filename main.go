@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/joho/godotenv"
 	"github.com/pmoorani/booksAPI/config"
+	"github.com/pmoorani/booksAPI/middlewares"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -44,7 +45,7 @@ func main() {
 	database.DB.Create(&models.Book{Isbn:"534124", Title:"Some book 2", AuthorID: author.ID})*/
 
 	router := gin.Default()
-	router.Use(TokenAuthMiddleware())
+	router.Use(middlewares.TokenAuthMiddleware())
 	api := router.Group("/api")
 	{
 		books := api.Group("/books")
