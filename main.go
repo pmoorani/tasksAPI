@@ -10,7 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/pmoorani/booksAPI/controllers"
 	"github.com/pmoorani/booksAPI/database"
 	"github.com/pmoorani/booksAPI/models"
@@ -33,12 +33,12 @@ func main() {
 	conf := config.New()
 
 	// Connection String
-	connectionString := fmt.Sprintf("%s:%s@/%s?charset=utf8&parseTime=True&loc=Local", conf.DBConfig.DBUsername, conf.DBConfig.DBPassword, conf.DBConfig.DBName)
-	fmt.Println(connectionString)
-	database.DB, err = gorm.Open("mysql", connectionString)
+	connectionString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", conf.DBConfig.DBHost, conf.DBConfig.DBPort, conf.DBConfig.DBUsername, conf.DBConfig.DBPassword, conf.DBConfig.DBName, conf.DBConfig.DBSSLMode)
+	database.DB, err = gorm.Open(conf.DBConfig.DBType, connectionString)
 	if err != nil {
-		panic("Failed to connect database")
+		panic(err.Error())
 	}
+	defer database.DB.Close()
 
 	// Migrate the schema
 	database.DB.Debug().AutoMigrate(&models.Author{}, &models.Book{}, &models.User{}, &models.Claims{})

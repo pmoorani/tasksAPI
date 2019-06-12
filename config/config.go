@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -19,6 +18,7 @@ type DatabaseConfig struct {
 	DBPassword string
 	DBType     string
 	DBPort     string
+	DBSSLMode string
 }
 
 type Config struct {
@@ -44,6 +44,7 @@ func New() *Config {
 			DBPassword: getEnv("DB_PASSWORD", ""),
 			DBType:     getEnv("DB_TYPE", ""),
 			DBPort:     getEnv("DB_PORT", ""),
+			DBSSLMode: getEnv("DB_SSLMode", "disable"),
 		},
 		SecretKey: getEnvAsByte("SECRET_KEY"),
 		DebugMode: getEnvAsBool("DEBUG_MODE", true),
@@ -54,8 +55,7 @@ func New() *Config {
 
 // Simple helper function to read an environment or return a default value
 func getEnv(key string, defaultVal string) string {
-	if value := os.Getenv(key); value != "" {
-		fmt.Println(value)
+	if value, exists := os.LookupEnv(key); exists {
 		return value
 	}
 

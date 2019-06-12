@@ -1,6 +1,6 @@
 module github.com/pmoorani/booksAPI
 
-go 1.12
+go 1.12.5
 
 require (
 	cloud.google.com/go v0.39.0 // indirect
