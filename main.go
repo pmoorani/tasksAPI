@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"github.com/joho/godotenv"
 	"github.com/pmoorani/booksAPI/config"
 	"github.com/pmoorani/booksAPI/middlewares"
@@ -44,7 +45,10 @@ func main() {
 	database.DB.Debug().AutoMigrate(&models.Author{}, &models.Book{}, &models.User{}, &models.Claims{})
 
 	port := os.Getenv("PORT")
+
 	router := gin.Default()
+	router.Use(cors.Default())
+
 	router.Use(middlewares.TokenAuthMiddleware())
 	api := router.Group("/api")
 	{

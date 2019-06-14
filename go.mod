@@ -1,12 +1,14 @@
 module github.com/pmoorani/booksAPI
 
 go 1.12
+
 // +heroku goVersion go1.12
 
 require (
 	cloud.google.com/go v0.39.0 // indirect
 	github.com/denisenkom/go-mssqldb v0.0.0-20190515213511-eb9f6a1743f3 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/gin-contrib/cors v1.3.0
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.4.0
 	github.com/go-playground/locales v0.12.1 // indirect
