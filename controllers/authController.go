@@ -41,12 +41,11 @@ func Register(c *gin.Context) {
 	}
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-	fmt.Print(hashedPassword)
-	user.Password = string(hashedPassword)
-	database.DB.Debug().Create(&user)
 
-	if user.ID <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": "Some error occurred!", "success": 0})
+	user.Password = string(hashedPassword)
+	if err = database.DB.Debug().Create(&user).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": "Username or Email already exists!", "success": 0})
+		return
 	}
 
 	user.Password = ""
