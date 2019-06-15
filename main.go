@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-contrib/cors"
 	"github.com/joho/godotenv"
 	"github.com/pmoorani/booksAPI/config"
 	"github.com/pmoorani/booksAPI/middlewares"
@@ -47,7 +46,7 @@ func main() {
 	port := os.Getenv("PORT")
 
 	router := gin.Default()
-	router.Use(cors.Default())
+	router.Use(middlewares.CORSMiddleware())
 
 	router.Use(middlewares.TokenAuthMiddleware())
 	api := router.Group("/api")
