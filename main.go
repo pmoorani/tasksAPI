@@ -33,7 +33,7 @@ func main() {
 	conf := config.New()
 
 	// Connection String
-	connectionString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", conf.DBConfig.DBHost, conf.DBConfig.DBPort, conf.DBConfig.DBUsername, conf.DBConfig.DBPassword, conf.DBConfig.DBName, conf.DBConfig.DBSSLMode)
+	connectionString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s", conf.DBConfig.DBHost, conf.DBConfig.DBPort, conf.DBConfig.DBUsername, conf.DBConfig.DBPassword, conf.DBConfig.DBName)
 	database.DB, err = gorm.Open(conf.DBConfig.DBType, connectionString)
 	if err != nil {
 		panic(err.Error())
@@ -41,9 +41,11 @@ func main() {
 	defer database.DB.Close()
 
 	// Migrate the schema
+	//database.DB.Debug().DropTableIfExists(&models.User{})
+	database.DB.Debug().AutoMigrate(&models.User{}, &models.Claims{})
 	database.DB.Debug().AutoMigrate(&models.Task{Title:"Some task!", Completed:true})
-	database.DB.Debug().AutoMigrate(&models.Author{}, &models.Book{}, &models.User{}, &models.Claims{})
-	database.DB.Create(&models.Task{Title:"Some task!", Completed:true})
+	database.DB.Debug().AutoMigrate(&models.Author{}, &models.Book{})
+	//database.DB.Create(&models.Task{Title:"Some task!", Completed:true})
 	port := os.Getenv("PORT")
 
 	router := gin.Default()
