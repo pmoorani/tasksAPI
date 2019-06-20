@@ -41,7 +41,8 @@ func main() {
 	defer database.DB.Close()
 
 	// Migrate the schema
-	database.DB.Debug().AutoMigrate(&models.Author{}, &models.Book{}, &models.User{}, &models.Claims{}, &models.Task{})
+	database.DB.Debug().AutoMigrate(&models.Task{Title:"Some task!", Completed:true})
+	database.DB.Debug().AutoMigrate(&models.Author{}, &models.Book{}, &models.User{}, &models.Claims{})
 	database.DB.Create(&models.Task{Title:"Some task!", Completed:true})
 	port := os.Getenv("PORT")
 
