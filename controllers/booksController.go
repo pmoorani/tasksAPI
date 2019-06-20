@@ -12,10 +12,6 @@ import (
 
 var validate *validator.Validate
 var books []models.Book
-var users = map[string]string{
-	"user1": "password1",
-	"user2": "password2",
-}
 
 func GetAllBooks(c *gin.Context) {
 	database.DB.Find(&books)

@@ -23,6 +23,7 @@ require (
 	github.com/leodido/go-urn v1.1.0 // indirect
 	github.com/lib/pq v1.1.1 // indirect
 	github.com/mattn/go-isatty v0.0.8 // indirect
+	github.com/satori/go.uuid v1.2.0
 	github.com/stretchr/objx v0.2.0 // indirect
 	go.opencensus.io v0.22.0 // indirect
 	golang.org/x/crypto v0.0.0-20190605123033-f99c8df09eb5

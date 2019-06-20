@@ -38,13 +38,14 @@ func Register(c *gin.Context) {
 
 	if resp, ok := user.Validate(); !ok {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": resp, "success": 0})
+		return
 	}
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-
 	user.Password = string(hashedPassword)
+
 	if err = database.DB.Debug().Create(&user).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": "Username or Email already exists!", "success": 0})
+		c.JSON(http.StatusBadRequest, gin.H{"msg": "Some error occurred!", "success": 0})
 		return
 	}
 
@@ -84,12 +85,14 @@ func Login(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"msg": "User not found!", "success": 0})
 		}
 		c.JSON(http.StatusBadRequest, gin.H{"msg": "Something went wrong!"})
+		return
 	}
 	fmt.Println(&userFromDB)
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userFromDB.Password))
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": "Invalid Username/Password"})
+		return
 	}
 
 	userFromDB.Password = ""

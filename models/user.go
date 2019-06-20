@@ -3,17 +3,14 @@ package models
 import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	//"github.com/jinzhu/gorm"
+	"github.com/pmoorani/booksAPI/database"
+
 	u "github.com/pmoorani/booksAPI/utils"
 	"strings"
-	"time"
 )
 
 type User struct {
-	ID        uint `json:"id" gorm:"primary_key"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	DeletedAt *time.Time `json:"deleted_at"`
+	BaseModel
 	Username string `json:"username" validate:"required" gorm:"unique_index"`
 	Password string `json:"password,omitempty" validate:"required"`
 	Email string `json:"email" gorm:"type:varchar(100);unique_index"`
@@ -39,6 +36,10 @@ func (user *User) Validate() (map[string] interface{}, bool) {
 
 	if len(user.Password) < 6 {
 		return u.Message(false, "Password should be min 6 characters"), false
+	}
+
+	if exists := database.DB.Where("username = ?", user.Username).First(&user); exists.RowsAffected != 0 {
+		return u.Message(false, "Username already exists!"), false
 	}
 
 	return u.Message(false, "Requirement passed"), true

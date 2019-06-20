@@ -41,8 +41,8 @@ func main() {
 	defer database.DB.Close()
 
 	// Migrate the schema
-	database.DB.Debug().AutoMigrate(&models.Author{}, &models.Book{}, &models.User{}, &models.Claims{})
-
+	database.DB.Debug().AutoMigrate(&models.Author{}, &models.Book{}, &models.User{}, &models.Claims{}, &models.Task{})
+	database.DB.Create(&models.Task{Title:"Some task!", Completed:true})
 	port := os.Getenv("PORT")
 
 	router := gin.Default()
@@ -58,6 +58,13 @@ func main() {
 			books.POST("/", controllers.CreateBook)
 			books.PUT("/:id", controllers.UpdateBook)
 			books.DELETE("/:id", controllers.DeleteBook)
+		}
+
+		tasks := api.Group("/tasks")
+		{
+			tasks.GET("/", controllers.GetAllTasks)
+			tasks.GET("/:uuid", controllers.GetTask)
+			tasks.POST("/", controllers.CreateTask)
 		}
 
 		api.POST("/login", controllers.Login)
