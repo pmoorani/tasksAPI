@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
+
 	"github.com/joho/godotenv"
 	"github.com/pmoorani/booksAPI/config"
 	"github.com/pmoorani/booksAPI/middlewares"
-	"log"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -42,8 +43,9 @@ func main() {
 
 	// Migrate the schema
 	//database.DB.Debug().DropTableIfExists(&models.User{})
+	//database.DB.Debug().DropTableIfExists(&models.Task{})
 	database.DB.Debug().AutoMigrate(&models.User{}, &models.Claims{})
-	database.DB.Debug().AutoMigrate(&models.Task{Title:"Some task!", Completed:true})
+	database.DB.Debug().AutoMigrate(&models.Task{Title: "Some task!", Completed: true})
 	database.DB.Debug().AutoMigrate(&models.Author{}, &models.Book{})
 	//database.DB.Create(&models.Task{Title:"Some task!", Completed:true})
 	port := os.Getenv("PORT")

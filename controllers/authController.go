@@ -2,15 +2,17 @@ package controllers
 
 import (
 	"fmt"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/pmoorani/booksAPI/config"
 	"github.com/pmoorani/booksAPI/database"
 
+	"net/http"
+	"time"
+
 	"github.com/pmoorani/booksAPI/models"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/validator.v9"
-	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -97,13 +99,13 @@ func Login(c *gin.Context) {
 
 	userFromDB.Password = ""
 
-
 	// Declare the expiration time of the token
 	// here, we have kept it as 30 minutes
 	expirationTime := time.Now().Add(30 * time.Minute)
 
 	// Create the JWT claims, which includes the username and expiry time
 	claims := &models.Claims{
+		UserId:   userFromDB.ID,
 		Username: user.Username,
 		StandardClaims: jwt.StandardClaims{
 			// In JWT, the expiry time is expressed as unix milliseconds
@@ -111,9 +113,11 @@ func Login(c *gin.Context) {
 		},
 	}
 
+	fmt.Println("claims = ", claims)
+
 	// Declare the token with the algorithm used for signing, and the claims
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
+	fmt.Println("token = ", token)
 	// Create the JWT String
 	tokenString, err := token.SignedString(SecretKey)
 	if err != nil {
@@ -126,9 +130,8 @@ func Login(c *gin.Context) {
 	// Finally, we set the client cookie for "token" as the JWT we just generated
 	// we also set an expiry time which is the same as the token itself
 	c.JSON(http.StatusOK, gin.H{
-		"user": userFromDB,
-		"token": tokenString,
+		"user":    userFromDB,
+		"token":   tokenString,
 		"expires": expirationTime,
 	})
 }
-

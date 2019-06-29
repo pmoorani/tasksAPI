@@ -1,10 +1,12 @@
 package middlewares
 
 import (
-	"github.com/pmoorani/booksAPI/config"
-	"github.com/pmoorani/booksAPI/models"
+	"fmt"
 	"net/http"
 	"strings"
+
+	"github.com/pmoorani/booksAPI/config"
+	"github.com/pmoorani/booksAPI/models"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -80,8 +82,8 @@ func TokenAuthMiddleware() gin.HandlerFunc {
 			token, err := jwt.ParseWithClaims(tokenPart, claims, func(token *jwt.Token) (interface{}, error) {
 				return []byte(SecretKey), nil
 			})
-			//log.Println(token.Valid, claims, err)
-
+			fmt.Println(token.Valid, "claims=", claims, "err=", err)
+			fmt.Println("token = ", token)
 			if !token.Valid {
 				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 					"msg":     "Token invalid",
@@ -97,6 +99,8 @@ func TokenAuthMiddleware() gin.HandlerFunc {
 				c.AbortWithStatus(http.StatusBadRequest)
 			}
 
+			claims.IsAuthenticated = true
+			c.Set("claims", claims)
 			c.Next()
 		}
 	}

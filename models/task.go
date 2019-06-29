@@ -3,15 +3,17 @@ package models
 import (
 	"github.com/pmoorani/booksAPI/database"
 	u "github.com/pmoorani/booksAPI/utils"
+	uuid "github.com/satori/go.uuid"
 )
 
 type Task struct {
 	BaseModel
-	Title string `json:"title"`
-	Completed bool `json:"completed"`
+	Title     string    `json:"title"`
+	Completed bool      `json:"completed"`
+	UserID    uuid.UUID `json:"user_id"`
 }
 
-func (task *Task) Validate() (map[string] interface{}, bool) {
+func (task *Task) Validate() (map[string]interface{}, bool) {
 	return u.Message(true, "Requirement passed!"), true
 }
 
@@ -32,5 +34,3 @@ func FindTaskByID(id interface{}) ([]Task, error) {
 	}
 	return tasks, nil
 }
-
-
