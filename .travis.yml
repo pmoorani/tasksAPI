@@ -1,3 +1,17 @@
+# use the latest ubuntu environment (18.04) available on travis
+dist: xenial
+
 language: go
-rvm:
-  - "1.12"
+
+# Force-enable Go modules. 
+# This will be unnecessary when Go 1.13 lands.
+env:
+  - GO111MODULE=on
+
+# Only clone the most recent commit.
+git:
+  depth: 1
+
+# Don't email me the results of the test runs.
+notifications:
+  email: false
