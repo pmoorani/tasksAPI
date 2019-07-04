@@ -19,7 +19,7 @@ func GetCurrentURLPath(c *gin.Context) string {
 func TokenAuthMiddleware() gin.HandlerFunc {
 	SecretKey := config.New().SecretKey
 	return func(c *gin.Context) {
-		if c.Request.Method != "POST" {
+		if c.Request.Method != "POST" && c.Request.Method != "PUT" && c.Request.Method != "DELETE" {
 			c.Next()
 			return
 		}

@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/pmoorani/booksAPI/database"
 	"github.com/pmoorani/booksAPI/models"
@@ -26,7 +28,9 @@ func GetAllTasks(c *gin.Context) {
 }
 
 func GetTask(c *gin.Context) {
+	fmt.Println("inside tasksController.GetTask()")
 	id := c.Param("uuid")
+	fmt.Println(id)
 	var task, err = models.FindTaskByID(id)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
@@ -49,7 +53,7 @@ func CreateTask(c *gin.Context) {
 	claimsInterface, _ := c.Get("claims")
 	claims := claimsInterface.(*models.Claims)
 
-	// Get the JSON body and decode into credentials
+	// Get the JSON body and decode into Task
 	err := c.ShouldBindJSON(&task)
 	if err != nil {
 		// If the structure of the body is wrong, return an HTTP err
@@ -76,4 +80,77 @@ func CreateTask(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"msg": "Task has been created!", "task": task, "success": 1})
+}
+
+func UpdateTask(c *gin.Context) {
+	var task models.Task
+	id := c.Param("uuid")
+	validate := validator.New()
+
+	taskFromDB, err := models.FindTaskByID(id)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"msg":     err.Error(),
+			"success": 0,
+		})
+		return
+	}
+
+	// Get the JSON body and decode into Task
+	err = c.ShouldBindJSON(&task)
+	if err != nil {
+		// If the structure of the body is wrong, return an HTTP err
+		c.JSON(http.StatusBadRequest, gin.H{"msg": "Something went wrong!"})
+		return
+	}
+
+	err = validate.Struct(task)
+	if err != nil {
+		validationErrors := err.(validator.ValidationErrors)
+		c.JSON(http.StatusBadRequest, gin.H{"msg": validationErrors.Error()})
+		return
+	}
+
+	if resp, ok := task.Validate(); !ok {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": resp, "success": 0})
+		return
+	}
+
+	taskFromDB.Status = task.Status
+	taskFromDB.Title = task.Title
+
+	if err = database.DB.Debug().Save(&taskFromDB).Error; err != nil {
+		fmt.Println(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"msg": "Some error occurred!", "success": 0})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"task":    taskFromDB,
+		"success": 1,
+	})
+}
+
+func DeleteTask(c *gin.Context) {
+	id := c.Param("uuid")
+
+	task, err := models.FindTaskByID(id)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"msg":     err.Error(),
+			"success": 0,
+		})
+		return
+	}
+
+	if err = database.DB.Debug().Delete(&task).Error; err != nil {
+		fmt.Println(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"msg": "Some error occurred!", "success": 0})
+		return
+	}
+
+	c.JSON(http.StatusNoContent, gin.H{
+		"msg":     "Successfully deleted!",
+		"success": 1,
+	})
 }

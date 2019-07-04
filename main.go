@@ -70,6 +70,8 @@ func main() {
 			tasks.GET("/", controllers.GetAllTasks)
 			tasks.GET("/:uuid", controllers.GetTask)
 			tasks.POST("/", controllers.CreateTask)
+			tasks.PUT("/:uuid", controllers.UpdateTask)
+			tasks.DELETE("/:uuid", controllers.DeleteTask)
 		}
 
 		api.POST("/login", controllers.Login)
