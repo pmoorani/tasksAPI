@@ -53,19 +53,21 @@ func main() {
 	fmt.Printf("Successfully parsed: %s", u2)
 
 	// Migrate the schema
-	//database.DB.Debug().DropTableIfExists(&models.User{})
-	//database.DB.Debug().DropTableIfExists(&models.Status{})
+	// database.DB.Debug().DropTableIfExists(&models.User{})
+	// database.DB.Debug().DropTableIfExists(&models.Status{})
+	// database.DB.Debug().DropTableIfExists(&models.Priority{})
 
 	database.DB.Debug().AutoMigrate(&models.Author{}, &models.Book{})
 	database.DB.Debug().AutoMigrate(&models.User{}, &models.Claims{})
 	database.DB.Debug().AutoMigrate(&models.Status{}, &models.Priority{})
 	database.DB.Debug().AutoMigrate(&models.Task{})
-	//database.DB.Debug().Create(&models.Status{Status: "Backlog", StatusDE: "Auftragsbestand"})
-	//database.DB.Debug().Create(&models.Status{Status: "In Progress", StatusDE: "In Bearbeitung"})
-	//database.DB.Debug().Create(&models.Status{Status: "Completed", StatusDE: "Abgeschlossen"})
-	//database.DB.Debug().Create(&models.Priority{Priority: "Low", PriorityDE: "Niedrig"})
-	//database.DB.Debug().Create(&models.Priority{Priority: "Medium", PriorityDE: "Mittel"})
-	//database.DB.Debug().Create(&models.Priority{Priority: "High", PriorityDE: "High"})
+
+	// database.DB.Debug().Create(&models.Status{Name: "Backlog", NameDE: "Auftragsbestand"})
+	// database.DB.Debug().Create(&models.Status{Name: "InProgress", NameDE: "In Bearbeitung"})
+	// database.DB.Debug().Create(&models.Status{Name: "Completed", NameDE: "Abgeschlossen"})
+	// database.DB.Debug().Create(&models.Priority{Name: "Low", NameDE: "Niedrig"})
+	// database.DB.Debug().Create(&models.Priority{Name: "Medium", NameDE: "Mittel"})
+	// database.DB.Debug().Create(&models.Priority{Name: "High", NameDE: "High"})
 
 	port := os.Getenv("PORT")
 

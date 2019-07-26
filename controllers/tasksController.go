@@ -118,10 +118,10 @@ func UpdateTask(c *gin.Context) {
 
 	taskFromDB.Title = task.Title
 	taskFromDB.Description = task.Description
-	taskFromDB.Priority = task.Priority
-	//taskFromDB.StatusID = task.StatusID
-	taskFromDB.StartDate = task.StartDate
-	taskFromDB.EndDate = task.EndDate
+	// taskFromDB.Priority.ID = task.Priority.ID
+	// taskFromDB.Status.ID = task.Status.ID
+	taskFromDB.Start = task.Start
+	taskFromDB.End = task.End
 
 	if err = database.DB.Debug().Save(&taskFromDB).Error; err != nil {
 		fmt.Println(err.Error())

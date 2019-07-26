@@ -15,22 +15,22 @@ type (
 		Description string    `json:"description"`
 		Priority    Priority  `json:"priority" gorm:"association_autocreate:false;default:1"`
 		Status      Status    `json:"status" gorm:"association_autocreate:false;default:1"`
-		StartDate   time.Time `json:"start_date"`
-		EndDate     time.Time `json:"end_date"`
+		Start       time.Time `json:"start"`
+		End         time.Time `json:"end"`
 		UserID      uuid.UUID `json:"user_id"`
 		//Assignee	User		`json:"assignee"`
 	}
 
 	Status struct {
 		BaseGormModel
-		Status   string `json:"status"`
-		StatusDE string `json:"status_de"`
+		Name   string `json:"name"`
+		NameDE string `json:"name_de"`
 	}
 
 	Priority struct {
 		BaseGormModel
-		Priority   string `json:"priority"`
-		PriorityDE string `json:"priority_de"`
+		Name   string `json:"name"`
+		NameDE string `json:"name_de"`
 	}
 )
 
