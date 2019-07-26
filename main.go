@@ -77,7 +77,7 @@ func main() {
 	{
 		api.GET("/", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{
-				"msg":   "Welcome to our world!",
+				"msg":     "Welcome to our world!",
 				"success": 1,
 			})
 		})

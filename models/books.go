@@ -13,8 +13,7 @@ type Author struct {
 
 type Book struct {
 	gorm.Model
-	Isbn   string  `json:"isbn"`
-	Title  string  `json:"title"`
-	AuthorID uint `json:"author_id"`
+	Isbn     string `json:"isbn"`
+	Title    string `json:"title"`
+	AuthorID uint   `json:"author_id"`
 }
-

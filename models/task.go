@@ -1,35 +1,36 @@
 package models
 
 import (
+	"time"
+
 	"github.com/pmoorani/booksAPI/database"
 	u "github.com/pmoorani/booksAPI/utils"
 	uuid "github.com/satori/go.uuid"
-	"time"
 )
 
 type (
 	Task struct {
 		BaseModel
-		Title     	string    	`json:"title"`
-		Description string 		`json:"description"`
-		Priority 	Priority 	`json:"priority" gorm:"association_autocreate:false;default:1"`
-		Status    	Status		`json:"status" gorm:"association_autocreate:false;default:1"`
-		StartDate 	time.Time 	`json:"start_date"`
-		EndDate 	time.Time 	`json:"end_date"`
-		UserID    	uuid.UUID 	`json:"user_id"`
+		Title       string    `json:"title"`
+		Description string    `json:"description"`
+		Priority    Priority  `json:"priority" gorm:"association_autocreate:false;default:1"`
+		Status      Status    `json:"status" gorm:"association_autocreate:false;default:1"`
+		StartDate   time.Time `json:"start_date"`
+		EndDate     time.Time `json:"end_date"`
+		UserID      uuid.UUID `json:"user_id"`
 		//Assignee	User		`json:"assignee"`
 	}
 
 	Status struct {
 		BaseGormModel
-		Status 		string 	`json:"status"`
-		StatusDE 	string 	`json:"status_de"`
+		Status   string `json:"status"`
+		StatusDE string `json:"status_de"`
 	}
 
 	Priority struct {
 		BaseGormModel
-		Priority 	string 	`json:"priority"`
-		PriorityDE	string 	`json:"priority_de"`
+		Priority   string `json:"priority"`
+		PriorityDE string `json:"priority_de"`
 	}
 )
 
