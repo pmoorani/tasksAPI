@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -15,6 +16,8 @@ import (
 	"github.com/pmoorani/booksAPI/controllers"
 	"github.com/pmoorani/booksAPI/database"
 	"github.com/pmoorani/booksAPI/models"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 var err error
@@ -41,13 +44,29 @@ func main() {
 	}
 	defer database.DB.Close()
 
+	// Parsing UUID from string input
+	u2, err := uuid.FromString("e76d832c-ae61-4a68-8615-f8942ec64c66")
+	if err != nil {
+		fmt.Printf("Something went wrong: %s", err)
+		return
+	}
+	fmt.Printf("Successfully parsed: %s", u2)
+
 	// Migrate the schema
 	//database.DB.Debug().DropTableIfExists(&models.User{})
-	//database.DB.Debug().DropTableIfExists(&models.Task{})
-	database.DB.Debug().AutoMigrate(&models.User{}, &models.Claims{})
-	database.DB.Debug().AutoMigrate(&models.Task{Title: "Some task!", Completed: true})
+	//database.DB.Debug().DropTableIfExists(&models.Status{})
+
 	database.DB.Debug().AutoMigrate(&models.Author{}, &models.Book{})
-	//database.DB.Create(&models.Task{Title:"Some task!", Completed:true})
+	database.DB.Debug().AutoMigrate(&models.User{}, &models.Claims{})
+	database.DB.Debug().AutoMigrate(&models.Status{}, &models.Priority{})
+	database.DB.Debug().AutoMigrate(&models.Task{})
+	//database.DB.Debug().Create(&models.Status{Status: "Backlog", StatusDE: "Auftragsbestand"})
+	//database.DB.Debug().Create(&models.Status{Status: "In Progress", StatusDE: "In Bearbeitung"})
+	//database.DB.Debug().Create(&models.Status{Status: "Completed", StatusDE: "Abgeschlossen"})
+	//database.DB.Debug().Create(&models.Priority{Priority: "Low", PriorityDE: "Niedrig"})
+	//database.DB.Debug().Create(&models.Priority{Priority: "Medium", PriorityDE: "Mittel"})
+	//database.DB.Debug().Create(&models.Priority{Priority: "High", PriorityDE: "High"})
+
 	port := os.Getenv("PORT")
 
 	router := gin.Default()
@@ -56,6 +75,13 @@ func main() {
 	router.Use(middlewares.TokenAuthMiddleware())
 	api := router.Group("/api")
 	{
+		api.GET("/", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{
+				"msg":   "Welcome to our world!",
+				"success": 1,
+			})
+		})
+
 		books := api.Group("/books")
 		{
 			books.GET("/", controllers.GetAllBooks)
@@ -72,6 +98,24 @@ func main() {
 			tasks.POST("/", controllers.CreateTask)
 			tasks.PUT("/:uuid", controllers.UpdateTask)
 			tasks.DELETE("/:uuid", controllers.DeleteTask)
+		}
+
+		users := api.Group("/users")
+		{
+			users.GET("/", controllers.GetAllUsers)
+			users.GET("/:uuid", controllers.GetUser)
+			users.PUT("/:uuid", controllers.UpdateUser)
+			users.DELETE("/:uuid", controllers.DeleteUser)
+		}
+
+		statuses := api.Group("/statuses")
+		{
+			statuses.GET("/", controllers.GetAllStatuses)
+		}
+
+		priorities := api.Group("/priorities")
+		{
+			priorities.GET("/", controllers.GetAllPriorities)
 		}
 
 		api.POST("/login", controllers.Login)

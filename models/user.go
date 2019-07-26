@@ -50,3 +50,24 @@ func (user *User) Validate() (map[string]interface{}, bool) {
 
 	return u.Message(false, "Requirement passed"), true
 }
+
+var users []User
+
+func AllUsers() ([]User, error) {
+	err := database.DB.Find(&users).Error
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
+func FindUserByID(id interface{}) (User, error) {
+	var user User
+	err := database.DB.Where("id = ?", id).Find(&user).Error
+	fmt.Println(err)
+
+	if err != nil {
+		return User{}, err
+	}
+	return user, nil
+}

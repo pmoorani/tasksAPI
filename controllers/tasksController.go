@@ -116,8 +116,12 @@ func UpdateTask(c *gin.Context) {
 		return
 	}
 
-	taskFromDB.Status = task.Status
 	taskFromDB.Title = task.Title
+	taskFromDB.Description = task.Description
+	taskFromDB.Priority = task.Priority
+	//taskFromDB.StatusID = task.StatusID
+	taskFromDB.StartDate = task.StartDate
+	taskFromDB.EndDate = task.EndDate
 
 	if err = database.DB.Debug().Save(&taskFromDB).Error; err != nil {
 		fmt.Println(err.Error())
@@ -151,6 +155,36 @@ func DeleteTask(c *gin.Context) {
 
 	c.JSON(http.StatusNoContent, gin.H{
 		"msg":     "Successfully deleted!",
+		"success": 1,
+	})
+}
+
+func GetAllStatuses(c *gin.Context) {
+	var statuses, err = models.AllStatuses()
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"msg":     err.Error(),
+			"success": 0,
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"tasks":   statuses,
+		"success": 1,
+	})
+}
+
+func GetAllPriorities(c *gin.Context) {
+	var priorities, err = models.AllPriorities()
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"msg":     err.Error(),
+			"success": 0,
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"tasks":   priorities,
 		"success": 1,
 	})
 }
