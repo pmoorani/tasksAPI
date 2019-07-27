@@ -15,7 +15,6 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/pmoorani/booksAPI/controllers"
 	"github.com/pmoorani/booksAPI/database"
-	"github.com/pmoorani/booksAPI/models"
 
 	uuid "github.com/satori/go.uuid"
 )
@@ -62,8 +61,8 @@ func main() {
 
 	//database.DB.Debug().CreateTable(&models.Author{}, &models.Book{})
 	//database.DB.Debug().CreateTable(&models.User{}, &models.Claims{})
-	database.DB.Debug().AutoMigrate(&models.Status{}, &models.Priority{})
-	database.DB.Debug().AutoMigrate(&models.Task{})
+	// database.DB.Debug().AutoMigrate(&models.Status{}, &models.Priority{})
+	// database.DB.Debug().AutoMigrate(&models.Task{})
 
 	//database.DB.Debug().Create(&models.Status{Name: "Backlog", NameDE: "Auftragsbestand"})
 	//database.DB.Debug().Create(&models.Status{Name: "InProgress", NameDE: "In Bearbeitung"})
@@ -71,20 +70,6 @@ func main() {
 	//database.DB.Debug().Create(&models.Priority{Name: "Low", NameDE: "Niedrig"})
 	//database.DB.Debug().Create(&models.Priority{Name: "Medium", NameDE: "Mittel"})
 	//database.DB.Debug().Create(&models.Priority{Name: "High", NameDE: "High"})
-
-	var status models.Status
-	var priority models.Priority
-	database.DB.Debug().First(&priority)
-	database.DB.Debug().First(&status)
-
-	fmt.Println("priority===", priority)
-	fmt.Println("status===", status)
-	task := models.Task{
-		Title:       "TaSkFoRTeSt!",
-		Description: "TeSt DeScRiPtIoN!",
-		UserID:   u2,
-	}
-	database.DB.Debug().Save(&task)
 
 	port := os.Getenv("PORT")
 

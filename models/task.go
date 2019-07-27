@@ -19,7 +19,6 @@ type (
 		Start       time.Time `json:"start"`
 		End         time.Time `json:"end"`
 		UserID      uuid.UUID `json:"user_id"`
-		//Assignee	User		`json:"assignee"`
 	}
 
 	TransformedTask struct {
@@ -167,8 +166,21 @@ func FindTaskByID(id interface{}) (TransformedTask, error) {
 		Status:      status,
 		Priority:    priority,
 	}
-	//err = database.DB.Select("id, username, first_name, last_name, email").Where("id = ?", &task.UserID).Find(&task.Assignee).Error
 	return _task, nil
+}
+
+func DeleteTaskByID(id interface{}) error {
+	var task Task
+	err := database.DB.Where("id = ?", id).Find(&task).Error
+
+	if err != nil {
+		return err
+	}
+
+	if err = database.DB.Delete(&task).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 func AllStatuses() ([]Status, error) {

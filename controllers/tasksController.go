@@ -57,14 +57,14 @@ func CreateTask(c *gin.Context) {
 	err := c.ShouldBindJSON(&task)
 	if err != nil {
 		// If the structure of the body is wrong, return an HTTP err
-		c.JSON(http.StatusBadRequest, gin.H{"msg": "Something went wrong!"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": "Something went wrong!", "error": err.Error()})
 		return
 	}
 
 	err = validate.Struct(task)
 	if err != nil {
 		validationErrors := err.(validator.ValidationErrors)
-		c.JSON(http.StatusBadRequest, gin.H{"msg": validationErrors.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": validationErrors.Error()})
 		return
 	}
 
@@ -75,7 +75,7 @@ func CreateTask(c *gin.Context) {
 
 	task.UserID = claims.UserId
 	if err = database.DB.Debug().Create(&task).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": "Some error occurred!", "success": 0})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": "Some error occurred!", "success": 0})
 		return
 	}
 
@@ -84,10 +84,11 @@ func CreateTask(c *gin.Context) {
 
 func UpdateTask(c *gin.Context) {
 	var task models.Task
+
 	id := c.Param("uuid")
 	validate := validator.New()
 
-	taskFromDB, err := models.FindTaskByID(id)
+	transformedTask, err := models.FindTaskByID(id)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
 			"msg":     err.Error(),
@@ -107,7 +108,7 @@ func UpdateTask(c *gin.Context) {
 	err = validate.Struct(task)
 	if err != nil {
 		validationErrors := err.(validator.ValidationErrors)
-		c.JSON(http.StatusBadRequest, gin.H{"msg": validationErrors.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": validationErrors.Error()})
 		return
 	}
 
@@ -116,45 +117,39 @@ func UpdateTask(c *gin.Context) {
 		return
 	}
 	fmt.Println("task ===", &task)
-	// taskFromDB.Title = task.Title
-	// taskFromDB.Description = task.Description
-	// // taskFromDB.Priority.ID = task.Priority.ID
-	// // taskFromDB.Status.ID = task.Status.ID
-	// taskFromDB.Start = task.Start
-	// taskFromDB.End = task.End
 
-	//if err = database.DB.Debug().Model(&task).
-	//	Where("id = ?", id).
-	//	Updates(models.Task{
-	//		Title:    task.Title,
-	//		Priority: models.Priority{ID:task.Priority.ID},
-	//	}).Error; err != nil {
-	//	fmt.Println(err.Error())
-	//	c.JSON(http.StatusBadRequest, gin.H{"msg": "Some error occurred!", "success": 0})
-	//	return
-	//}
+	_task := models.Task{
+		BaseModel:   transformedTask.BaseModel,
+		Title:       transformedTask.Title,
+		Description: transformedTask.Description,
+		PriorityID:  transformedTask.Priority.ID,
+		StatusID:    transformedTask.Status.ID,
+		Start:       transformedTask.Start,
+		End:         transformedTask.End,
+		UserID:      transformedTask.User.ID,
+	}
+
+	if err = database.DB.Debug().Model(&_task).Update(&task).Error; err != nil {
+		fmt.Println(err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": "Some error occurred!", "success": 0})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"task":    taskFromDB,
+		"task":    _task,
 		"success": 1,
 	})
 }
 
 func DeleteTask(c *gin.Context) {
 	id := c.Param("uuid")
+	err := models.DeleteTaskByID(id)
 
-	task, err := models.FindTaskByID(id)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
 			"msg":     err.Error(),
 			"success": 0,
 		})
-		return
-	}
-
-	if err = database.DB.Debug().Delete(&task).Error; err != nil {
-		fmt.Println(err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"msg": "Some error occurred!", "success": 0})
 		return
 	}
 
