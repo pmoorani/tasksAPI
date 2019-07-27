@@ -115,19 +115,24 @@ func UpdateTask(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": resp, "success": 0})
 		return
 	}
+	fmt.Println("task ===", &task)
+	// taskFromDB.Title = task.Title
+	// taskFromDB.Description = task.Description
+	// // taskFromDB.Priority.ID = task.Priority.ID
+	// // taskFromDB.Status.ID = task.Status.ID
+	// taskFromDB.Start = task.Start
+	// taskFromDB.End = task.End
 
-	taskFromDB.Title = task.Title
-	taskFromDB.Description = task.Description
-	// taskFromDB.Priority.ID = task.Priority.ID
-	// taskFromDB.Status.ID = task.Status.ID
-	taskFromDB.Start = task.Start
-	taskFromDB.End = task.End
-
-	if err = database.DB.Debug().Save(&taskFromDB).Error; err != nil {
-		fmt.Println(err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"msg": "Some error occurred!", "success": 0})
-		return
-	}
+	//if err = database.DB.Debug().Model(&task).
+	//	Where("id = ?", id).
+	//	Updates(models.Task{
+	//		Title:    task.Title,
+	//		Priority: models.Priority{ID:task.Priority.ID},
+	//	}).Error; err != nil {
+	//	fmt.Println(err.Error())
+	//	c.JSON(http.StatusBadRequest, gin.H{"msg": "Some error occurred!", "success": 0})
+	//	return
+	//}
 
 	c.JSON(http.StatusOK, gin.H{
 		"task":    taskFromDB,

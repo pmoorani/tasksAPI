@@ -12,18 +12,18 @@ type GitHubConfig struct {
 }
 
 type DatabaseConfig struct {
-	DBHost      string
+	DBHost     string
 	DBName     string
 	DBUsername string
 	DBPassword string
 	DBType     string
 	DBPort     string
-	DBSSLMode string
+	DBSSLMode  string
 }
 
 type Config struct {
-	DBConfig DatabaseConfig
-	GitHub GitHubConfig
+	DBConfig  DatabaseConfig
+	GitHub    GitHubConfig
 	SecretKey []byte
 	DebugMode bool
 	UserRoles []string
@@ -35,16 +35,16 @@ func New() *Config {
 	return &Config{
 		GitHub: GitHubConfig{
 			Username: getEnv("GITHUB_USERNAME", ""),
-			APIKey: getEnv("GITHUB_API_KEY", ""),
+			APIKey:   getEnv("GITHUB_API_KEY", ""),
 		},
 		DBConfig: DatabaseConfig{
-			DBHost:      getEnv("DB_HOST", ""),
+			DBHost:     getEnv("DB_HOST", ""),
 			DBName:     getEnv("DB_NAME", ""),
 			DBUsername: getEnv("DB_USER", ""),
 			DBPassword: getEnv("DB_PASSWORD", ""),
 			DBType:     getEnv("DB_TYPE", ""),
 			DBPort:     getEnv("DB_PORT", ""),
-			DBSSLMode: getEnv("DB_SSLMode", "disable"),
+			DBSSLMode:  getEnv("DB_SSLMode", "disable"),
 		},
 		SecretKey: getEnvAsByte("SECRET_KEY"),
 		DebugMode: getEnvAsBool("DEBUG_MODE", true),

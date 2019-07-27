@@ -40,5 +40,6 @@ require (
 	google.golang.org/genproto v0.0.0-20190605220351-eb0b1bdb6ae6 // indirect
 	google.golang.org/grpc v1.21.1 // indirect
 	gopkg.in/go-playground/validator.v9 v9.29.0
+	gopkg.in/gormigrate.v1 v1.6.0 // indirect
 	honnef.co/go/tools v0.0.0-20190605142022-0a11fc526260 // indirect
 )

@@ -22,7 +22,7 @@ func GetAllUsers(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"tasks":   users,
+		"users":   users,
 		"success": 1,
 	})
 }
@@ -41,7 +41,7 @@ func GetUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"task":    user,
+		"user":    user,
 		"success": 1,
 	})
 }

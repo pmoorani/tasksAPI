@@ -1,4 +1,5 @@
 .env
+local.env
 .docker_build/
 bin/
 .vscode/

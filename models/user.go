@@ -12,16 +12,26 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-type User struct {
-	BaseModel
-	Username  string `json:"username" validate:"required" gorm:"unique_index"`
-	Password  string `json:"password,omitempty" validate:"required"`
-	Email     string `json:"email" gorm:"type:varchar(100);unique_index"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Token     string `json:"token" gorm:"-"`
-	Tasks     []Task `json:"tasks"`
-}
+type (
+	User struct {
+		BaseModel
+		Username  string `json:"username" validate:"required" gorm:"unique_index"`
+		Password  string `json:"password,omitempty" validate:"required"`
+		Email     string `json:"email" gorm:"type:varchar(100);unique_index"`
+		FirstName string `json:"first_name"`
+		LastName  string `json:"last_name"`
+		Token     string `json:"token" gorm:"-"`
+		Tasks     []Task `json:"tasks"`
+	}
+
+	TransformedUser struct {
+		BaseModel
+		Username  string `json:"username" validate:"required" gorm:"unique_index"`
+		Email     string `json:"email" gorm:"type:varchar(100);unique_index"`
+		FirstName string `json:"first_name"`
+		LastName  string `json:"last_name"`
+	}
+)
 
 // Create a struct that will be encoded to a JWT
 // We add jwt.StandardClaims as an embedded type, to provide fields like expiry time
@@ -52,22 +62,41 @@ func (user *User) Validate() (map[string]interface{}, bool) {
 }
 
 var users []User
+var _users []TransformedUser
 
-func AllUsers() ([]User, error) {
+func AllUsers() ([]TransformedUser, error) {
 	err := database.DB.Find(&users).Error
 	if err != nil {
 		return nil, err
 	}
-	return users, nil
+	for _, items := range users {
+		_users = append(_users, TransformedUser{
+			BaseModel: items.BaseModel,
+			Username:  items.Username,
+			Email:     items.Email,
+			FirstName: items.FirstName,
+			LastName:  items.LastName,
+		})
+	}
+	return _users, nil
 }
 
-func FindUserByID(id interface{}) (User, error) {
+func FindUserByID(id interface{}) (TransformedUser, error) {
 	var user User
-	err := database.DB.Where("id = ?", id).Find(&user).Error
+
+	err := database.DB.Select("id, created_at, updated_at, username, first_name, last_name, email").Where("id = ?", id).Find(&user).Error
 	fmt.Println(err)
 
 	if err != nil {
-		return User{}, err
+		return TransformedUser{}, err
 	}
-	return user, nil
+
+	_user := TransformedUser{
+		BaseModel: user.BaseModel,
+		Username:  user.Username,
+		Email:     user.Email,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+	}
+	return _user, nil
 }

@@ -26,7 +26,7 @@ func init() {
 	// Load .env file
 	_ = godotenv.Load()
 	log.Println("init()")
-	//if err := godotenv.Load("sc.env"); err != nil {
+	//if err := godotenv.Load(""); err != nil {
 	//	log.Print("No .env file found!")
 	//	return
 	//}
@@ -37,13 +37,15 @@ func main() {
 	conf := config.New()
 
 	// Connection String
-	connectionString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s", conf.DBConfig.DBHost, conf.DBConfig.DBPort, conf.DBConfig.DBUsername, conf.DBConfig.DBPassword, conf.DBConfig.DBName)
+	connectionString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=require", conf.DBConfig.DBHost, conf.DBConfig.DBPort, conf.DBConfig.DBUsername, conf.DBConfig.DBPassword, conf.DBConfig.DBName)
+	fmt.Println(connectionString)
 	database.DB, err = gorm.Open(conf.DBConfig.DBType, connectionString)
 	if err != nil {
 		panic(err.Error())
 	}
 	defer database.DB.Close()
 
+	database.DB.LogMode(true)
 	// Parsing UUID from string input
 	u2, err := uuid.FromString("e76d832c-ae61-4a68-8615-f8942ec64c66")
 	if err != nil {
@@ -54,20 +56,35 @@ func main() {
 
 	// Migrate the schema
 	// database.DB.Debug().DropTableIfExists(&models.User{})
-	// database.DB.Debug().DropTableIfExists(&models.Status{})
-	// database.DB.Debug().DropTableIfExists(&models.Priority{})
+	//database.DB.Debug().DropTableIfExists(&models.Task{})
+	//database.DB.Debug().DropTableIfExists(&models.Status{})
+	//database.DB.Debug().DropTableIfExists(&models.Priority{})
 
-	database.DB.Debug().AutoMigrate(&models.Author{}, &models.Book{})
-	database.DB.Debug().AutoMigrate(&models.User{}, &models.Claims{})
+	//database.DB.Debug().CreateTable(&models.Author{}, &models.Book{})
+	//database.DB.Debug().CreateTable(&models.User{}, &models.Claims{})
 	database.DB.Debug().AutoMigrate(&models.Status{}, &models.Priority{})
 	database.DB.Debug().AutoMigrate(&models.Task{})
 
-	// database.DB.Debug().Create(&models.Status{Name: "Backlog", NameDE: "Auftragsbestand"})
-	// database.DB.Debug().Create(&models.Status{Name: "InProgress", NameDE: "In Bearbeitung"})
-	// database.DB.Debug().Create(&models.Status{Name: "Completed", NameDE: "Abgeschlossen"})
-	// database.DB.Debug().Create(&models.Priority{Name: "Low", NameDE: "Niedrig"})
-	// database.DB.Debug().Create(&models.Priority{Name: "Medium", NameDE: "Mittel"})
-	// database.DB.Debug().Create(&models.Priority{Name: "High", NameDE: "High"})
+	//database.DB.Debug().Create(&models.Status{Name: "Backlog", NameDE: "Auftragsbestand"})
+	//database.DB.Debug().Create(&models.Status{Name: "InProgress", NameDE: "In Bearbeitung"})
+	//database.DB.Debug().Create(&models.Status{Name: "Completed", NameDE: "Abgeschlossen"})
+	//database.DB.Debug().Create(&models.Priority{Name: "Low", NameDE: "Niedrig"})
+	//database.DB.Debug().Create(&models.Priority{Name: "Medium", NameDE: "Mittel"})
+	//database.DB.Debug().Create(&models.Priority{Name: "High", NameDE: "High"})
+
+	var status models.Status
+	var priority models.Priority
+	database.DB.Debug().First(&priority)
+	database.DB.Debug().First(&status)
+
+	fmt.Println("priority===", priority)
+	fmt.Println("status===", status)
+	task := models.Task{
+		Title:       "TaSkFoRTeSt!",
+		Description: "TeSt DeScRiPtIoN!",
+		UserID:   u2,
+	}
+	database.DB.Debug().Save(&task)
 
 	port := os.Getenv("PORT")
 

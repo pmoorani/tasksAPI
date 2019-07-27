@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/pmoorani/booksAPI/database"
@@ -13,24 +14,41 @@ type (
 		BaseModel
 		Title       string    `json:"title"`
 		Description string    `json:"description"`
-		Priority    Priority  `json:"priority" gorm:"association_autocreate:false;default:1"`
-		Status      Status    `json:"status" gorm:"association_autocreate:false;default:1"`
+		PriorityID  uint      `json:"priority_id" gorm:"association_autocreate:false;default:1"`
+		StatusID    uint      `json:"status_id" gorm:"association_autocreate:false;default:1"`
 		Start       time.Time `json:"start"`
 		End         time.Time `json:"end"`
 		UserID      uuid.UUID `json:"user_id"`
 		//Assignee	User		`json:"assignee"`
 	}
 
+	TransformedTask struct {
+		BaseModel
+		Title       string          `json:"title"`
+		Description string          `json:"description"`
+		Start       time.Time       `json:"start"`
+		End         time.Time       `json:"end"`
+		User        TransformedUser `json:"user"`
+		Status      Status          `json:"status"`
+		Priority    Priority        `json:"priority"`
+	}
+
 	Status struct {
-		BaseGormModel
-		Name   string `json:"name"`
-		NameDE string `json:"name_de"`
+		ID        uint       `json:"id" gorm:"primary_key"`
+		CreatedAt time.Time  `json:"created_at"`
+		UpdatedAt time.Time  `json:"updated_at"`
+		DeletedAt *time.Time `json:"deleted_at"`
+		Name      string     `json:"name"`
+		NameDE    string     `json:"name_de"`
 	}
 
 	Priority struct {
-		BaseGormModel
-		Name   string `json:"name"`
-		NameDE string `json:"name_de"`
+		ID        uint       `json:"id" gorm:"primary_key"`
+		CreatedAt time.Time  `json:"created_at"`
+		UpdatedAt time.Time  `json:"updated_at"`
+		DeletedAt *time.Time `json:"deleted_at"`
+		Name      string     `json:"name"`
+		NameDE    string     `json:"name_de"`
 	}
 )
 
@@ -63,25 +81,94 @@ func (task *Task) Validate() (map[string]interface{}, bool) {
 }
 
 var tasks []Task
+var _tasks []TransformedTask
 
-func AllTasks() ([]Task, error) {
+func AllTasks() ([]TransformedTask, error) {
+	var status Status
+	var priority Priority
+	var user TransformedUser
+
 	err := database.DB.Find(&tasks).Error
 	if err != nil {
 		return nil, err
 	}
-	return tasks, nil
+
+	for _, item := range tasks {
+		if item.StatusID > 0 {
+			database.DB.Where("id = ?", item.StatusID).Find(&status)
+		} else {
+			status = Status{}
+		}
+
+		if item.PriorityID > 0 {
+			database.DB.Where("id = ?", item.PriorityID).Find(&priority)
+		} else {
+			priority = Priority{}
+		}
+
+		user, err = FindUserByID(item.UserID)
+		if err != nil {
+			fmt.Println(err)
+			user = TransformedUser{}
+		}
+
+		_tasks = append(_tasks, TransformedTask{
+			BaseModel:   item.BaseModel,
+			Title:       item.Title,
+			Description: item.Description,
+			Start:       item.Start,
+			End:         item.End,
+			Status:      status,
+			Priority:    priority,
+			User:        user,
+		})
+	}
+
+	return _tasks, nil
+
 }
 
-func FindTaskByID(id interface{}) (Task, error) {
+func FindTaskByID(id interface{}) (TransformedTask, error) {
 	var task Task
+	var status Status
+	var priority Priority
+	var user TransformedUser
+
 	err := database.DB.Where("id = ?", id).Find(&task).Error
 
 	if err != nil {
-		return Task{}, err
+		return TransformedTask{}, err
 	}
 
+	if task.StatusID > 0 {
+		database.DB.Where("id = ?", task.StatusID).Find(&status)
+	} else {
+		status = Status{}
+	}
+
+	if task.PriorityID > 0 {
+		database.DB.Where("id = ?", task.PriorityID).Find(&priority)
+	} else {
+		priority = Priority{}
+	}
+
+	user, err = FindUserByID(task.UserID)
+	if err != nil {
+		fmt.Println(err)
+		user = TransformedUser{}
+	}
+	_task := TransformedTask{
+		BaseModel:   task.BaseModel,
+		Title:       task.Title,
+		Description: task.Description,
+		Start:       task.Start,
+		End:         task.End,
+		User:        user,
+		Status:      status,
+		Priority:    priority,
+	}
 	//err = database.DB.Select("id, username, first_name, last_name, email").Where("id = ?", &task.UserID).Find(&task.Assignee).Error
-	return task, nil
+	return _task, nil
 }
 
 func AllStatuses() ([]Status, error) {
