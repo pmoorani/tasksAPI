@@ -79,13 +79,14 @@ func (task *Task) Validate() (map[string]interface{}, bool) {
 	return u.Message(true, "Requirement passed!"), true
 }
 
-var tasks []Task
-var _tasks []TransformedTask
 
 func AllTasks() ([]TransformedTask, error) {
+	var tasks []Task
+	var _tasks []TransformedTask
 	var status Status
 	var priority Priority
 	var user TransformedUser
+
 
 	err := database.DB.Find(&tasks).Error
 	if err != nil {
@@ -124,7 +125,6 @@ func AllTasks() ([]TransformedTask, error) {
 	}
 
 	return _tasks, nil
-
 }
 
 func FindTaskByID(id interface{}) (TransformedTask, error) {

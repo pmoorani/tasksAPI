@@ -61,10 +61,10 @@ func (user *User) Validate() (map[string]interface{}, bool) {
 	return u.Message(false, "Requirement passed"), true
 }
 
-var users []User
-var _users []TransformedUser
-
 func AllUsers() ([]TransformedUser, error) {
+	var users []User
+	var _users []TransformedUser
+
 	err := database.DB.Find(&users).Error
 	if err != nil {
 		return nil, err
