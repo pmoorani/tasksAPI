@@ -87,7 +87,6 @@ func AllTasks() ([]TransformedTask, error) {
 	var priority Priority
 	var user TransformedUser
 
-
 	err := database.DB.Find(&tasks).Error
 	if err != nil {
 		return nil, err
@@ -95,13 +94,19 @@ func AllTasks() ([]TransformedTask, error) {
 
 	for _, item := range tasks {
 		if item.StatusID > 0 {
-			database.DB.Where("id = ?", item.StatusID).Find(&status)
+			status, err = FindStatusByID(item.StatusID)
+			if err != nil {
+				fmt.Println(err)
+			}
 		} else {
 			status = Status{}
 		}
 
 		if item.PriorityID > 0 {
-			database.DB.Where("id = ?", item.PriorityID).Find(&priority)
+			priority, err = FindPriorityByID(item.PriorityID)
+			if err != nil {
+				fmt.Println(err)
+			}
 		} else {
 			priority = Priority{}
 		}
@@ -140,13 +145,19 @@ func FindTaskByID(id interface{}) (TransformedTask, error) {
 	}
 
 	if task.StatusID > 0 {
-		database.DB.Where("id = ?", task.StatusID).Find(&status)
+		status, err = FindStatusByID(task.StatusID)
+		if err != nil {
+			fmt.Println(err)
+		}
 	} else {
 		status = Status{}
 	}
 
 	if task.PriorityID > 0 {
-		database.DB.Where("id = ?", task.PriorityID).Find(&priority)
+		priority, err = FindPriorityByID(task.PriorityID)
+		if err != nil {
+			fmt.Println(err)
+		}
 	} else {
 		priority = Priority{}
 	}
@@ -193,6 +204,17 @@ func AllStatuses() ([]Status, error) {
 	return statuses, nil
 }
 
+func FindStatusByID(id interface{}) (Status, error) {
+	var status Status
+
+	err := database.DB.Where("id = ?", id).First(&status).Error
+
+	if err != nil {
+		return Status{}, err
+	}
+	return status, nil
+}
+
 func AllPriorities() ([]Priority, error) {
 	var priorities []Priority
 	err := database.DB.Find(&priorities).Error
@@ -201,4 +223,15 @@ func AllPriorities() ([]Priority, error) {
 		return nil, err
 	}
 	return priorities, nil
+}
+
+func FindPriorityByID(id interface{}) (Priority, error) {
+	var priority Priority
+
+	err := database.DB.Where("id = ?", id).First(&priority).Error
+
+	if err != nil {
+		return Priority{}, err
+	}
+	return priority, nil
 }
