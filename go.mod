@@ -1,4 +1,4 @@
-module github.com/pmoorani/booksAPI
+module github.com/pmoorani/tasksAPI
 
 go 1.12
 

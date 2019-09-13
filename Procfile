@@ -1,1 +1,1 @@
-web: bin/booksAPI
+web: bin/tasksAPI
