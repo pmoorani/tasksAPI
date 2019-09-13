@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/pmoorani/booksAPI/database"
-	"github.com/pmoorani/booksAPI/models"
+	"github.com/pmoorani/tasksAPI/database"
+	"github.com/pmoorani/tasksAPI/models"
 
 	"net/http"
 

@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/pmoorani/booksAPI/database"
+	"github.com/pmoorani/tasksAPI/database"
 
 	"strings"
 
-	u "github.com/pmoorani/booksAPI/utils"
+	u "github.com/pmoorani/tasksAPI/utils"
 	uuid "github.com/satori/go.uuid"
 )
 

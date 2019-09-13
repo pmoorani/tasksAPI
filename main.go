@@ -2,19 +2,18 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/pmoorani/booksAPI/config"
-	"github.com/pmoorani/booksAPI/middlewares"
+	"github.com/pmoorani/tasksAPI/config"
+	"github.com/pmoorani/tasksAPI/middlewares"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	"github.com/pmoorani/booksAPI/controllers"
-	"github.com/pmoorani/booksAPI/database"
+	"github.com/pmoorani/tasksAPI/controllers"
+	"github.com/pmoorani/tasksAPI/database"
 
 	uuid "github.com/satori/go.uuid"
 )
@@ -22,13 +21,16 @@ import (
 var err error
 
 func init() {
-	// Load .env file
-	_ = godotenv.Load()
-	log.Println("init()")
-	//if err := godotenv.Load(""); err != nil {
-	//	log.Print("No .env file found!")
-	//	return
-	//}
+	env := os.Getenv("TMS_ENV")
+
+	if "development" == env {
+		godotenv.Load(".env." + env + ".local")
+	}
+
+	if "production" == env {
+		godotenv.Load()
+		gin.SetMode(gin.ReleaseMode)
+	}
 }
 
 func main() {
@@ -36,7 +38,7 @@ func main() {
 	conf := config.New()
 
 	// Connection String
-	connectionString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=require", conf.DBConfig.DBHost, conf.DBConfig.DBPort, conf.DBConfig.DBUsername, conf.DBConfig.DBPassword, conf.DBConfig.DBName)
+	connectionString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", conf.DBConfig.DBHost, conf.DBConfig.DBPort, conf.DBConfig.DBUsername, conf.DBConfig.DBPassword, conf.DBConfig.DBName, conf.DBConfig.DBSSLMode)
 	fmt.Println(connectionString)
 	database.DB, err = gorm.Open(conf.DBConfig.DBType, connectionString)
 	if err != nil {
@@ -75,8 +77,8 @@ func main() {
 
 	router := gin.Default()
 	router.Use(middlewares.CORSMiddleware())
-
 	router.Use(middlewares.TokenAuthMiddleware())
+
 	api := router.Group("/api")
 	{
 		api.GET("/", func(c *gin.Context) {
@@ -85,15 +87,6 @@ func main() {
 				"success": 1,
 			})
 		})
-
-		books := api.Group("/books")
-		{
-			books.GET("/", controllers.GetAllBooks)
-			books.GET("/:id", controllers.GetBook)
-			books.POST("/", controllers.CreateBook)
-			books.PUT("/:id", controllers.UpdateBook)
-			books.DELETE("/:id", controllers.DeleteBook)
-		}
 
 		tasks := api.Group("/tasks")
 		{

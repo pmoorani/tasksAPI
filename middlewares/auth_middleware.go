@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/pmoorani/booksAPI/config"
-	"github.com/pmoorani/booksAPI/models"
+	"github.com/pmoorani/tasksAPI/config"
+	"github.com/pmoorani/tasksAPI/models"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -29,7 +29,7 @@ func TokenAuthMiddleware() gin.HandlerFunc {
 		notAuth := []string{"/api/login", "/api/register"}
 		requestPath := GetCurrentURLPath(c)
 
-		// Check if request does not need Authentication, serve the request if it doesn't need it
+		// Check if request does not need Authentication
 		for _, value := range notAuth {
 			if value == requestPath {
 				c.Next()

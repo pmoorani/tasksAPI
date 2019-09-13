@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/pmoorani/booksAPI/database"
-	"github.com/pmoorani/booksAPI/models"
+	"github.com/pmoorani/tasksAPI/database"
+	"github.com/pmoorani/tasksAPI/models"
 
 	"net/http"
 
@@ -28,9 +28,7 @@ func GetAllTasks(c *gin.Context) {
 }
 
 func GetTask(c *gin.Context) {
-	fmt.Println("inside tasksController.GetTask()")
 	id := c.Param("uuid")
-	fmt.Println(id)
 	var task, err = models.FindTaskByID(id)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{

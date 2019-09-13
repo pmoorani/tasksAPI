@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/pmoorani/booksAPI/database"
-	u "github.com/pmoorani/booksAPI/utils"
+	"github.com/pmoorani/tasksAPI/database"
+	u "github.com/pmoorani/tasksAPI/utils"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -78,7 +78,6 @@ func (s *Status) Scan(v interface{}) error {
 func (task *Task) Validate() (map[string]interface{}, bool) {
 	return u.Message(true, "Requirement passed!"), true
 }
-
 
 func AllTasks() ([]TransformedTask, error) {
 	var tasks []Task

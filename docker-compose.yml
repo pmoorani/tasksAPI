@@ -1,0 +1,47 @@
+version: "3"
+services:
+  db:
+    image: postgres
+    hostname: db
+    environment:
+      GET_HOST_FROM: dns
+      DB_HOST: ${DB_HOST}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      DB_TYPE: ${DB_TYPE}
+      DB_PORT: ${DB_PORT}
+      GITHUB_USERNAME: ${GITHUB_USERNAME}
+      GITHUB_API_KEY: ${GITHUB_API_KEY}
+      MAX_USERS: ${MAX_USERS}
+      USER_ROLES: ${USER_ROLES}
+      DEBUG_MODE: ${DEBUG_MODE}
+    ports:
+      - "5433:5432"
+    networks:
+      - tmsnet
+  app:
+    image: pmoorani/tmsapp
+    hostname: app
+    environment:
+      GET_HOST_FROM: dns
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "8081:8080"
+    networks:
+      - tmsnet
+    depends_on:
+      - db
+    links:
+      - db
+    labels:
+      kompose.service.type: LoadBalancer
+
+networks:
+  tmsnet:
+    driver: bridge
+
+
+

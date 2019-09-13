@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/pmoorani/booksAPI/database"
-	"github.com/pmoorani/booksAPI/models"
+	"github.com/pmoorani/tasksAPI/database"
+	"github.com/pmoorani/tasksAPI/models"
 	"gopkg.in/go-playground/validator.v9"
 	"net/http"
 

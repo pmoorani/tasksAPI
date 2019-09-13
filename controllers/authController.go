@@ -4,13 +4,13 @@ import (
 	"fmt"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/pmoorani/booksAPI/config"
-	"github.com/pmoorani/booksAPI/database"
+	"github.com/pmoorani/tasksAPI/config"
+	"github.com/pmoorani/tasksAPI/database"
 
 	"net/http"
 	"time"
 
-	"github.com/pmoorani/booksAPI/models"
+	"github.com/pmoorani/tasksAPI/models"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/validator.v9"
 
