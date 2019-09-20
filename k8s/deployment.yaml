@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tms
+  labels:
+    app: tms
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tms
+  template:
+    metadata:
+      name: tms
+      labels:
+        app: tms
+    spec:
+      containers:
+        - name: tms
+          image: pmoorani/tms-service:latest
+          envFrom:
+            - configMapRef:
+                name: tms-config
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: tms-config
+              mountPath: /etc/tms/
+              readOnly: true
+      volumes:
+        - name: tms-config
+          configMap:
+            name: tms-config
+      restartPolicy: Always
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: tms-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: tms
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080

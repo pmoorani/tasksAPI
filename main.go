@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/pmoorani/tasksAPI/models"
 	"net/http"
 	"os"
 
@@ -21,10 +22,11 @@ import (
 var err error
 
 func init() {
+	fmt.Println("init()")
 	env := os.Getenv("TMS_ENV")
-
+	fmt.Printf(env)
 	if "development" == env {
-		godotenv.Load(".env." + env + ".local")
+		godotenv.Load(".env.local")
 	}
 
 	if "production" == env {
@@ -56,6 +58,34 @@ func main() {
 	fmt.Printf("Successfully parsed: %s", u2)
 
 	// Migrate the schema
+
+	if !database.DB.HasTable(&models.User{}) {
+		database.DB.CreateTable(&models.User{})
+	}
+
+	if !database.DB.HasTable(&models.Claims{}) {
+		database.DB.CreateTable(&models.Claims{})
+	}
+
+	if !database.DB.HasTable(&models.Task{}) {
+		database.DB.CreateTable(&models.Task{})
+
+	}
+
+	if !database.DB.HasTable(&models.Status{}) {
+		database.DB.CreateTable(&models.Status{})
+		database.DB.Debug().Create(&models.Status{Name: "Backlog", NameDE: "Auftragsbestand"})
+		database.DB.Debug().Create(&models.Status{Name: "InProgress", NameDE: "In Bearbeitung"})
+		database.DB.Debug().Create(&models.Status{Name: "Completed", NameDE: "Abgeschlossen"})
+	}
+
+	if !database.DB.HasTable(&models.Priority{}) {
+		database.DB.CreateTable(&models.Priority{})
+		database.DB.Debug().Create(&models.Priority{Name: "Low", NameDE: "Niedrig"})
+		database.DB.Debug().Create(&models.Priority{Name: "Medium", NameDE: "Mittel"})
+		database.DB.Debug().Create(&models.Priority{Name: "High", NameDE: "High"})
+	}
+
 	// database.DB.Debug().DropTableIfExists(&models.User{})
 	//database.DB.Debug().DropTableIfExists(&models.Task{})
 	//database.DB.Debug().DropTableIfExists(&models.Status{})
@@ -84,6 +114,7 @@ func main() {
 		api.GET("/", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{
 				"msg":     "Welcome to our world!",
+				"host": os.Getenv("HOSTNAME"),
 				"success": 1,
 			})
 		})
